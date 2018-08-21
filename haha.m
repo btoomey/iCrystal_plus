@@ -1,0 +1,1 @@
+ RDFPlot(RDFDefault(distanceinfo,info,posForFurtherUse))

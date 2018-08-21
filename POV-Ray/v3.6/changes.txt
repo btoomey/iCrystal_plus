@@ -1,0 +1,472 @@
+$Id: //depot/povray/3.5/windows/setup/files/changes.txt#40 $
+
+This document lists some of the changes/fixes to POVWIN since version 3.5 was
+released. Only relevent changes are listed. Note that this document does not
+generally list changes made to the renderer itself - this file relates mainly
+to Windows-specific changes. See revision.txt for changes to the rendering
+engine.
+
+1 June 2009 - 3.6.2 release
+---------------------------
+
+Change 4793 on 2009/05/26 by chrisc@x8
+
+  split binaries and text file paths as per v3.7.
+  NB as of this change, Win9x/ME/NT4 are no longer supported.
+
+Change 4792 on 2009/05/26 by chrisc@x8
+
+  make XP highres icons the default.
+
+Change 4789 on 2009/05/23 by chrisc@x8
+
+  add SSE2 config to windows project.
+
+Change 4779 on 2009/05/17 by chrisc@x8
+
+  merge editor changes from SMP tree, split reserved words out into
+    stand-alone file.
+
+Change 4775 on 2009/05/14 by chrisc@x8
+
+  fix deadlock under Vista when an animation is run.
+
+Change 4411 on 2007/04/17 by chrisc@x4
+
+  add Control-A support in commandline input box (select all).
+	back-port 3.7 code handling render window z-order issue.
+  change render window keypress code to hand focus to main window for
+    any key, not just escape.
+
+Change 4395 on 2007/04/14 by chrisc@x4
+
+  delete vc5, vc6, vc.net and current vs 2005 projects. all except the
+    last are no longer up to date. deleted the last to provide a clean start to
+    create a new vs 2005 project so 64-bit support can be added in. (the old
+    project had targets for it but they had never been used since the Intel
+    compiler was building it).
+	
+Change 4388 on 2007/04/14 by chrisc@x4
+
+  Fix jpeg temp file issue reported in thread web.46168c053403448a4f02351a0@news.povray.org
+
+Change 4360 on 2007/03/31 by chrisc@x4
+
+  merge v3.7 codemax changes back into 3.6 codebase
+
+Change 4359 on 2007/03/31 by chrisc@x4
+
+  fix issue with editor window splitting not being restored
+    (45620b9e$1@news.povray.org).
+  fix issue with file type not being set on initial save if 'save as'
+    was not used (reported many times, including 45602a08@news.povray.org
+    and 46092c8a@news.povray.org).
+
+2 April 2006 - 3.6.1c release (Windows only)
+--------------------------------------------
+
+3.6.1c contains one windows-specific fix and one core fix. The primary
+reason for the release is to provide the windows-specific fix due to its
+impact.
+
+  o If a 'feature advice' message box was displayed early in the POVWIN
+    startup, it was possible that it would appear off-screen and thus be
+    inaccessable (this is a totally separate issue from the 'about box'
+    fix provided in 3.6.1b). This has been corrected.
+
+  o Included also is the fix for the 'trace fails with no_image object in 
+    union' bug reported in http://news.povray.org/43f57a9d$1@news.povray.org.
+
+5 Dec 2005 - 3.6.1b release (Windows only)
+-------------------------------------------
+
+3.6.1b contains two windows-specific fixes.
+
+  o When displaying the main window or dialogs, a bug in our fixup routine
+    prevented them from being auto-adjusted to fit within the screen. The
+    result was that occasionally the about box would be displayed with the
+    'OK' button off-screen. This has been fixed.
+
+  o On some systems, if a file that had been open in the editor was deleted
+    while POV-Ray was not running, the program would crash upon restart. We
+    have not been able to replicate this (for us it would just result in a
+    blank editor page, which was the intended outcome). However the editor
+    now contains extra code to check for this situation, with the result that
+    such files will now never be restored (even to blank pages).
+
+23 Jan 2005 - 3.6.1a release (Windows only)
+-------------------------------------------
+
+Note for 3.6.1a: A large number of changes are not listed here. These were
+either related to re-writing the editor support DLL, porting codemax to 64-bit,
+or making the base POV Windows code 64-bit compatible. To save listing a lot of
+small changes, here is a summary of what was done:
+
+  o With this release, the filenames of DLL's have changed: povcmax2.dll becomes
+    povcmax32.dll, cmedit.dll becomes cmedit32.dll, and povupdate.dll becomes
+    povupdate32.dll. For 64-bit builds the obvious equivalents apply.
+
+  o The codemax editor itself (povcmax32.dll) has been modified so that it is
+    compatible with 64-bit windows. Some additional functionality was also
+    added with respect to printing.
+
+  o The editor support DLL, cmedit32.dll, was completely re-written. It was
+    previously based on Borland's C++Builder. The new version - which has
+    all the old functionality plus a few enhancements (e.g. color printing) -
+    is written in plain C++ and is able to be compiled with Microsoft C++
+    v7 or later (v8 is required if producing an AMD64 binary). It does not
+    require any special GUI class libraries such as .NET, ATL or MFC.
+
+    From the user's perspective very little should have changed.
+
+    This re-write was a major undertaking; while some bits of code was re-used
+    it nevertheless required several thousand lines of code to be created. The
+    outcome however is that for the first time, all of POV-Ray for Windows can
+    be compiled with a standard Win32 C++ compiler such as Visual C++ v7. Plus,
+    it is now possible to create a fully-native 64-bit binary (including all
+    DLL's).
+
+  o A manifest file is now linked in with the EXE, giving updated appearance
+    on Windows XP.
+
+The primary reason for doing a Windows sub-version release (the 'a' bit in
+3.6.1a) is to expose this new code to wider use and hopefully in the process
+fix some bugs that folks were seeing in the old editor support DLL.
+
+Note that we have previously released a 64-bit build of POVWIN and that
+obviously it includes the above changes. 3.6.1a is a Win32-specific release.
+
+            -------------------------------------------
+
+Change 3241 on 2005/01/06 by chrisc@hyperthread
+
+  add re-rendered standard-sized insert menu bitmaps to tree.
+
+Change 3240 on 2005/01/06 by chrisc@hyperthread
+
+  update Insert Menu files to specify version 3.6.
+
+Change 3231 on 2004/12/09 by chrisc@hyperthread
+
+  fix potential buffer overflow reported by Ross Litscher.
+
+Change 3229 on 2004/12/06 by chrisc@hyperthread
+
+  update makefiles for vc.net and ICL.
+
+Change 3208 on 2004/10/24 by chrisc@hyperthread
+
+  Fix issue in pvbmp.cpp causing resumed traces to have corrupted data.
+
+Change 3014 on 2004/07/27 by chrisc@hyperthread
+
+  update to no longer use povproto.h.
+
+1 August 2004 - 3.6.1 release
+-----------------------------
+
+Change 2965 on 2004/07/10 by chrisc@hyperthread
+
+  minor clean-up of old files.
+
+Change 2958 on 2004/07/07 by chrisc@hyperthread
+
+  fix 'backend thread failed to init' bug (needed volatile declaration for render context).
+  restore ICL project.
+
+Change 2947 on 2004/07/05 by chrisc@hyperthread
+
+	delete a few files, modify guiext license.
+
+Change 2870 on 2004/06/09 by chrisc@hyperthread
+
+  vc.net project.
+
+Change 2869 on 2004/06/09 by chrisc@hyperthread
+
+  tweak editor cloning code.
+
+Change 2867 on 2004/06/09 by chrisc@hyperthread
+
+  few tweaks to help keywords; update pvlegal.h; fix minor bug writing povlegal to disk.
+
+Change 2862 on 2004/06/09 by chrisc@hyperthread
+
+  change two keywords for help lookup.
+
+7 June 2004 - 3.6.0 release
+---------------------------
+
+Change 2806 on 2004/06/06 by chrisc@hyperthread
+
+  provide basic support for multiple monitors (so at least we don't insist
+    on putting the render window on the primary monitor each time it's shown).
+  various other minor tweaks.
+
+31 May 2004 - 3.6.release-candidate.1
+-------------------------------------
+
+Change 2731 on 2004/05/28 by chrisc@hyperthread
+
+  removes fasternoise files (no longer used).
+
+Change 2730 on 2004/05/28 by chrisc@hyperthread
+
+  check I/O restrictions when opening stream output files.
+  ensure we use OTextStream instead of OStreams so we get LF to CRLF conversion.
+
+Change 2719 on 2004/05/24 by chrisc@hyperthread
+
+  fix bug in word wrap function.
+
+Change 2706 on 2004/05/19 by chrisc@hyperthread
+
+  Insert menu source file change from Christoph.
+  
+15 April 2004 - 3.6.beta.4
+--------------------------
+
+Change 2628 on 2004/04/16 by chrisc@hyperthread
+
+  rerun and output INI file changes.
+  NB rerun still doesn't work due to issue with core INI file parser.
+
+Change 2621 on 2004/04/16 by chrisc@hyperthread
+
+  sound events now have their own dialog and are stored in the INI file.
+
+1 April 2004 - 3.6.beta.3
+-------------------------
+
+Change 2565 on 2004/03/31 by chrisc@hyperthread
+
+  update stream code to use rawoutput method.
+  re-jig message display code for more efficient path from stream functions.
+  modify stream output on message window to be word-wrapped to width.
+  other misc changes.
+
+Change 2540 on 2004/03/15 by chrisc@hyperthread
+
+  add missing CR to stream file output.
+
+15 March 2004 - 3.6.beta.2
+-------------------------------
+
+Change 2535 on 2004/03/14 by chrisc@hyperthread
+
+  adds 'feature notification' dialogs for new users.
+
+Change 2532 on 2004/03/14 by chrisc@hyperthread
+
+  Set window title during parsing.
+  Don't show about box because version has changed.
+  Set default text file buffer to 64k.
+
+Change 2514 on 2004/03/12 by chrisc@hyperthread
+
+  improve command-line option handling.
+  wait a bit longer before giving up on backend thread startup.
+  add code to load povray.ini if present in source file directory.
+  work around code generation bug in intel compiler.
+  make continue trace work when output file does not exist (and in some other cases).
+  set expiry to 31 March 2004.
+  some other stuff.
+
+Change 2513 on 2004/03/12 by chrisc@hyperthread
+
+  improve frontend handling for streams, especially file writing.
+
+Change 2510 on 2004/03/11 by chrisc@lilliput
+
+  handle quoted include paths correctly in editor include file search.
+
+Change 2483 on 2004/02/27 by chrisc@lilliput
+
+  fix reversed parameters in some PovMessageBox calls.
+
+Change 2454 on 2004/02/05 by chrisc@lilliput
+
+  Ensure CLOCKS_PER_SEC is used consistently.
+
+25 January 2004 - 3.6.beta.1
+-------------------------------
+
+Change 2432 on 2004/01/24 by chrisc@hyperthread
+
+  add new frontend class to get error messages.
+
+Change 2422 on 2004/01/19 by chrisc@lilliput
+
+  update about and splash bitmaps.
+
+Change 2408 on 2004/01/17 by chrisc@hyperthread
+
+  extended 32bpp BMP support to actually use alpha channel data.
+
+Change 2407 on 2004/01/17 by chrisc@hyperthread
+
+  update pvbmp.c so that an input stream is deleted on error.
+
+Change 2406 on 2004/01/17 by chrisc@hyperthread
+
+  add support for reading 32bpp BMP images. code from ABIS Software.
+
+Change 2404 on 2004/01/17 by chrisc@hyperthread
+
+  add two missing VC.NET solution files, tweak dependencies in main file.
+
+Change 2386 on 2003/12/20 by chrisc@lilliput
+
+  main code will now catch unhandled exceptions from the core.
+  also make the message loop run more smoothly for editing.
+  some other minor changes.
+
+Change 2385 on 2003/12/20 by chrisc@lilliput
+
+  update Intel makefile and VC6 project.
+  N.B. VC6 project won't build due to issues with the compiler.
+
+Change 2384 on 2003/12/20 by chrisc@lilliput
+
+  slight tweak to core editor DLL to fix annoying multi-second pauses on XP.
+
+Change 2381 on 2003/12/08 by _abx_@abx
+
+  makefiles updated to POV-Ray 3.6 directory structure
+
+Change 2380 on 2003/12/08 by _abx_@abx
+
+  fix for NAN definition conflict under MinGW
+
+Change 2374 on 2003/12/05 by _abx_@abx
+
+  update to usage of <sys/stat.h> macros instead of compiler specific 
+  defines, compiler version update, no old names usage in MinGW
+
+Change 2373 on 2003/12/05 by _abx_@abx
+
+  adjustement of file deleting function to the settings of whole POV-Ray
+
+Change 2371 on 2003/12/04 by _abx_@abx
+
+  common header for console config
+
+Change 2370 on 2003/12/04 by _abx_@abx
+
+  adjustment of namespaces and changes in new POVMS to nonofficial compilers
+
+Change 2369 on 2003/12/04 by _abx_@abx
+
+  removed unused GUI_priority
+
+Change 2354 on 2003/11/25 by chrisc@lilliput
+
+  few more frontend tweaks, fairly functional now, other than rerun info.
+
+Change 2350 on 2003/11/24 by chrisc@lilliput
+
+  update registry path to 'v3.6'.
+  add code to copy editor registry settings tree.
+
+Change 2347 on 2003/11/24 by chrisc@lilliput
+
+  quote output paths in insert menu re-render INI file.
+
+Change 2337 on 2003/11/20 by chrisc@lilliput
+
+  New POVMS interface and frontend class stuff. Work in progress.
+
+Change 2294 on 2003/11/03 by _abx_@abx
+
+  added support for DJGPP compiler
+
+Change 2283 on 2003/10/28 by chrisc@lilliput
+
+  Add support for receiving POVMS output messages directly.
+
+Change 2269 on 2003/10/26 by chrisc@lilliput
+
+  Rename (via integrate so as to keep revision history) pvengine's .C files to .CPP.
+
+Change 2264 on 2003/10/22 by _abx_@abx
+
+  Adjustement to Open Watcom compiler
+
+Change 2259 on 2003/10/21 by _abx_@abx
+
+  new pvbmp code
+
+Change 2251 on 2003/10/13 by _abx_@abx
+
+  fixes for complete Borland and MinGW, console and GUI builds
+
+Change 2243 on 2003/10/10 by _abx_@abx
+
+  initial makefile for watcom
+
+Change 2240 on 2003/10/10 by _abx_@abx
+
+  Namespace added to Windows GUI sources
+
+Change 2239 on 2003/10/08 by _abx_@abx
+
+  makefile and configuration for MinGW
+
+Change 2229 on 2003/10/06 by _abx_@abx
+
+  initial config file for console compilation targeted to Windowses
+
+Change 2228 on 2003/10/06 by _abx_@abx
+
+  initial version of makefiles for popular compilers
+
+Change 2174 on 2003/08/15 by chrisc@lilliput
+
+  Add vc.net project.
+
+Change 2158 on 2003/08/09 by chrisc@lilliput
+
+  Add support to allow limited use of POV-Ray for Windows even
+    when it has not been installed (e.g. registry settings missing).
+    It still requires write access to the install tree if you want
+    the INI files to be updated. Tries to substitute inferred paths
+    into logical places (e.g. library path, secondary INI file path).
+
+  Fix error in editor where a filename specified as a UNC path would
+    cause it to loop forever.
+
+  Fix silly typo in GUI priority setting routine preventing it from
+    ever being anything other than 'normal'.
+
+Change 2156 on 2003/08/09 by chrisc@lilliput
+
+  Update installer to allow continuation even if the common control
+    version test fails. Also ensure that paths in INI files are quoted
+    with single quotes.
+
+Change 1985 on 2002/12/28 by chrisc@lilliput
+
+  If a render has been running more than 15 minutes, and a user
+    hits the 'stop' button, they are asked if they really want to
+    cancel the render.
+
+Change 1983 on 2002/12/28 by chrisc@lilliput
+
+  Updated main icon from Tony [B] which contains alpha channel for XP.
+
+Change 1982 on 2002/12/28 by chrisc@lilliput
+
+  Change file changed save dialog so that hitting 'escape' cancels
+    the operation instead of answering 'no'.
+
+Change 1920 on 2002/09/30 by chrisc@lilliput
+
+  Add optional (compile-time) core memory tracking to Windows code.
+
+Change 1812 on 2002/07/27 by chrisc@lilliput
+
+  Add RequestSetCooperateLevel to GUIEXT support code.
+  Update GUIEXT license (povext.txt).
+  Update GUIEXT demo source to work with VC6.
+  Add GUIDEMO project to povray workspace.
+
