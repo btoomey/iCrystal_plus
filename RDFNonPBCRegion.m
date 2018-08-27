@@ -64,7 +64,7 @@ for j = 1:numElement
         end
         points = vertcat(listOfPoints1,listOfPoints2);
         [gar, V] = convhull(points);
-        rdf = rdf4(listOfPoints1,listOfPoints2,V,dr,rmax,rmin);
+        rdf = findRDF(listOfPoints1,listOfPoints2,V,dr,rmax,rmin);
         rdfCell{count2,1} = rdf;
         rdfCell{count2,2} = rowCell{count2,1};
         count2 = count2 + 1;
@@ -76,7 +76,7 @@ if l>1 && wronginput==1
         listOfPoints = push(distanceinfo{callnum(p),1},listOfPoints);
     end
     [gar, V] = convhull(listOfPoints);
-    rdf = rdf4(listOfPoints1,listOfPoints2,V,dr,rmax,rmin);
+    rdf = findRDF(listOfPoints1,listOfPoints2,V,dr,rmax,rmin);
     rdfCell{count2,1} = rdf;
     rdfCell{count2,2} = elementType;
 end

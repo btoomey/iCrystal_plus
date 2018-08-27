@@ -8,7 +8,7 @@ rdfCell = {};
 [gar, V] = convhull(posForFurtherUse);
 % if rmax is undefined, initialize it to be -1
 
-rdf = rdf4(posForFurtherUse,posForFurtherUse,V,dr,rmax,rmin);
+rdf = findRDF(posForFurtherUse,posForFurtherUse,V,dr,rmax,rmin);
 rdfCell{1,1} = rdf;
 rdfCell{1,2} = 'All-in-one';
 
@@ -36,6 +36,7 @@ if numregion>1
     rdfCell1 =  RDFNonPBCRegion(big,distanceinfo,info,posForFurtherUse,rmax,rmin,dr,e1,e2);
     rdfCell = vertcat(rdfCell, rdfCell1);
     end
+    % If there is only one region, suppress duplicate graphs.
     if big~=small && numsmall > 10
         rdfCell1 =  RDFNonPBCRegion(small,distanceinfo,info,posForFurtherUse,rmax,rmin,dr,e1,e2);
         rdfCell = vertcat(rdfCell, rdfCell1);

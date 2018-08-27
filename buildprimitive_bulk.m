@@ -6,24 +6,24 @@ global tol1 tol2 tol3 tol4 tol5
 %to 10000 in order to accomodate larger zeolite unit cells. Again, we take
 %the minimum of 10000 and the number of atoms in order to ensure that we
 %stay within the range of the sample. 
-twoThousand  = min(10000, max);
+tenThousand  = min(10000, max);
 startPoint = distanceinfo{P,1};
 orders = distanceinfo{P,2};
-orders = orders(:,2:twoThousand);
+orders = orders(:,2:tenThousand);
 orders = orders';
-points = zeros(twoThousand - 1,3);
-count = 1;
-foundBasis = 0;
-basis = zeros(3,3);
+points = zeros(tenThousand - 1,3);
+
+
 matchlist = [];
-for i = 1: twoThousand - 1
+for i = 1: tenThousand - 1
     points(i,:) = distanceinfo{orders(i),1};
 end
-twoHundred = min(1500,max);
-for vectorFinder = 1:twoHundred-1
+numNeighbors = min(1500,max);
+for vectorFinder = 1:numNeighbors-1
     endPoint = points(vectorFinder, :);
     vector = endPoint - startPoint;
     match = shiftAndMatch(vector, points);
+    % matchlist contains the lattice vectors
     if match
         matchlist = push(vector, matchlist);
     end
@@ -92,14 +92,14 @@ function [ bool ] = shiftAndMatch(vector, points)
 global tol1 tol2 tol3 tol4 tol5
 nonMatch = 0;
 [row, gar] = size(points);
-fifty = min(15, row);
-shiftingPoints = points(1:fifty, :);
-shift = repmat(vector, fifty, 1);
+fifteen = min(15, row);
+shiftingPoints = points(1:fifteen, :);
+shift = repmat(vector, fifteen, 1);
 shiftedPoints = shiftingPoints + shift;
 
 
 [IDX, D] = knnsearch(points, shiftedPoints);
-for i = 1:fifty
+for i = 1:fifteen
     if D(i)> tol2
         nonMatch = nonMatch + 1;
     end

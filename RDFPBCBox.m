@@ -80,7 +80,7 @@ for j = 1:numElement
         end
         points = vertcat(listOfPoints1,listOfPoints2);
 %         dr = 0.01;
-        rdf = rdf2_pbc_v2(listOfPoints1,listOfPoints2,dim,rmin,rmax,dr);
+        rdf = findRDFPBC(listOfPoints1,listOfPoints2,dim,rmin,rmax,dr);
         rdfCell{count2,1} = rdf;
         rdfCell{count2,2} = rowCell{count2,1};
         count2 = count2 + 1;
@@ -91,7 +91,7 @@ if l >1 && wronginput==1
     for p = 1:n
         listOfPoints = push(distanceinfo{callnum(p),1},listOfPoints);
     end
-    rdf = rdf2_pbc_v2(listOfPoints,listOfPoints,dim,rmin,rmax,dr);
+    rdf = findRDFPBC(listOfPoints,listOfPoints,dim,rmin,rmax,dr);
     rdfCell{count2,1} = rdf;
     rdfCell{count2,2} = 'Total';
 end

@@ -1,7 +1,11 @@
 % Initializations
 clear all
+% make tolerances global
 global tol1 tol2 tol3 tol4 tol5
 load('tol.mat');
+
+% If the user doesn't input tolerance, initialized the tolerance to
+% default value.
 if isempty(tol1)
     tol1 = 3;
 end
@@ -20,20 +24,16 @@ end
 
 % read data from file
 % pos is the original matrix
-[name, num, pos] = read_xyz_v3(address);
-%get the distance info
-% disp(address);
+[name, num, pos] = readData(address);
+
 disp('Finished reading file');
 
-% [m,gar] = size(pos);
-% for i = 1:m
-%     if norm(pos(i,:))>1E5
-%         pos(i,:)=[];
-%         num = num-1;
-%     end
-% end
 
 
+%get the distanceinfo
+% distanceinfo contains 300 nearest neighbors of each point in the sample
+% we store these nearest neighbors so that we don't need to regenerate them
+% every time we generate primitive vectors.
 [distanceinfo] = getDistancek(pos);
 
 
@@ -58,6 +58,7 @@ info = {};
 sizepos = size(pos);
 row = sizepos(1);
 
+% elt_names stores the name of elements present in the sample
 elt_names = find_names(name);
 
 %Here's where we label each point with its corresponding element type. 
@@ -89,7 +90,7 @@ else
     end
 end
 
-%distanceinfo is where we store the element type corresponding to each
+%We update distanceinfo to store the element type corresponding to each
 %atom. 
 distanceinfo = horzcat(distanceinfo, elt_types);
 
@@ -117,12 +118,12 @@ while row >= cursor
         if ~isequal(A, -1)
             % perform niggli reduction and get the 6 parameters of the niggli
             % form
-            [v1, v2, v3, v4, v5, v6] = niggliReduce_fromThePaper(a, b, c);
+            [v1, v2, v3, v4, v5, v6] = niggliReduce(a, b, c);
 
             % determine bravais type
             str = niggliToLattice(v1, v2, v3, v4, v5, v6);
 
-             % generate 6 neighbors of the starting point
+             % generate expected 6 neighbors of the starting point
              neighbor = gen6(A, a, b, c);
 
             % check if all 6 neighbors are in the data. If they all are, 
@@ -132,12 +133,20 @@ while row >= cursor
             for i = 1:6
                 point = neighbor(i,:);
                 M = distanceinfo{cursor,2};
-                searchArea = zeros(27,3);
-                for j = 1:27
+                % searchArea contains 50 nearest neighbors of the starting point 
+                searchArea = zeros(50,3);
+                for j = 1:50
                     searchArea(j,:) = distanceinfo{M(j),1};
                 end
                 [idx,D1] = dsearchn(searchArea, point);
                 [gar,D2] = dsearchn(idxlist, idx);
+                
+                % if any of the expected 6 neighbors is not found in the data
+                %or if the same point is mistakenly labeled as a match for
+                %two different expected neighbors
+                % or if one of the expected nearest neighbors is in the sample 
+                %but has already been identified
+                % in another region
                 if D1>tol2 || D2<1 ||distanceinfo{M(idx),3} == 1
                     allNeighborsInData = 0;
                     break;
@@ -146,13 +155,9 @@ while row >= cursor
             end
 
             % if starting point is not interior, try the next point.
-            if allNeighborsInData
-                
-   
-
+            if allNeighborsInData         
                 %do the projection
-                [boundary, interior,region,perfect, distanceinfo] = projection_Xuchen_fast2(current_pt,cursor,a,b,c,pos,distanceinfo);       
-%                 if size(region,1)>18
+                [boundary, interior,region,perfect, distanceinfo] = projection(current_pt,cursor,a,b,c,pos,distanceinfo);       
                 % increment the region number 
                 numregion = numregion + 1;
 
@@ -170,15 +175,11 @@ while row >= cursor
                 rowRegion = sizeRegion(1);
                 info{numregion,8} = rowRegion;
                 info{numregion,9} = A;
-%                 end
             end
         end
     end
  cursor = cursor + 1;
 end
-
-
-
 disp('Finished finding normal lattices');
 
 
@@ -196,12 +197,12 @@ while cursor <= row
         current_pt =  distanceinfo{cursor, 1};
 
         % build primitive from the 48 nearest neighbor of the starting point
-        [A,B,C,D,a,b,c] = buildprimitive_interlock_fast(distanceinfo{cursor, 2}, current_pt,pos);
+        [A,B,C,D,a,b,c] = buildprimitive_interlock(distanceinfo{cursor, 2}, current_pt,pos);
 
 
         if ~isequal(A, -1)
             % niggli reduction
-            [v1, v2, v3, v4, v5, v6] = niggliReduce_fromThePaper(a, b, c);
+            [v1, v2, v3, v4, v5, v6] = niggliReduce(a, b, c);
 
             % determine bravais type
             str = niggliToLattice(v1, v2, v3, v4, v5, v6);
@@ -215,8 +216,8 @@ while cursor <= row
             for i = 1:6
                 point = neighbor(i,:);
                 M = distanceinfo{cursor,2};
-                searchArea = zeros(27,3);
-                for j = 1:27
+                searchArea = zeros(50,3);
+                for j = 1:50
                     searchArea(j,:) = distanceinfo{M(j),1};
                 end
                 [idx,D1] = dsearchn(searchArea, point);
@@ -227,23 +228,12 @@ while cursor <= row
                 end
                 idxlist = push(idx, idxlist);
             end
-%             for i = 1:6
-%                 point = neighbor(i,:);
-%                 [garbage,D] = dsearchn(pos, point);
-%                 if D>tol2
-%                     allNeighborsInData = 0;
-%                     break;
-%                 end
-%             end
-            
-            if allNeighborsInData
 
+            if allNeighborsInData
                 %do the projection
-                [boundary, interior,region,perfect, distanceinfo] = projection_Xuchen_fast_interlocking(current_pt,a,b,c,pos,distanceinfo,cursor);
+                [boundary, interior,region,perfect, distanceinfo] = projectionInterlocking(current_pt,a,b,c,pos,distanceinfo,cursor);
                 sizeRegion = size(region);
                 rowRegion = sizeRegion(1);
-
-                
                 % determine whether this region is interlocking with a
                 % region that has already been identified
                 exist = 0;
@@ -298,10 +288,6 @@ while cursor <= row
 end
 
 %end
-
-
-
-
 disp('Finished finding interlocking structures');
 
 
@@ -408,8 +394,6 @@ while cursor <= row
         cursor = cursor+1;
     end
 end
-
-
 disp('Finished finding exterior points');
 
 % Higher Symmetry handling
@@ -449,12 +433,7 @@ for i = 1:size_info(1)
         end
         eltsCell{j,1} = elts;
     end
-        
-            
-    
-    
-    
-    
+
     for j = 1:length_num
         elts_of_current_type = eltsCell{j,1};
         % atoms_in_current_region_of_current_type picks out all the atoms
@@ -476,17 +455,6 @@ for i = 1:size_info(1)
         end
     end
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 %Do Niggli reduction with positions_of_most_prevalent_type
 sizepos = size(positions_of_most_prevalent_type);
 pos2 = positions_of_most_prevalent_type;
@@ -500,7 +468,7 @@ while row >= cursor
     [A,B,C,D,a,b,c] = buildprimitive(distanceinfo2{cursor, 2}, current_pt, pos2);
     if ~isequal(A, -1)
         % niggli reduction
-        [v1, v2, v3, v4, v5, v6] = niggliReduce_fromThePaper(a, b, c);
+        [v1, v2, v3, v4, v5, v6] = niggliReduce(a, b, c);
         % determine bravais type
         str = niggliToLattice(v1, v2, v3, v4, v5, v6);
         % generate 6 neighbors of the starting point
@@ -573,7 +541,6 @@ while row >= cursor
     end
 cursor = cursor + 1;
 end
-
         %Compare symmetry
         str2 = info{i, 5};
              if strcmp(str2, 'triclinic')
@@ -684,6 +651,9 @@ countprimitive = 0;
 numregion0 = numregion;
 stop = 0;
 numberunidentified = size(discopy,1);
+% to avoid spending too much time on amorphous samples. We randomly choose starting point to check
+% for zeolite structure, and only do so a number times so that we are
+% 99.99% confident about the result.
 while stop == 0 && numberunidentified >100
     confidence = 0.0001;
     percent = 100/numberunidentified;
@@ -701,11 +671,7 @@ found = 0;
 for i = 1:trynum
     merged = 0;
     cursor = discopy(numbers(i));
-%     % if the point is matched, skip
-%     if distanceinfo{cursor,3} == 1
-%         cursor = cursor + 1;
-%         continue;
-%     end
+
     % build primitive
     [a,b,c] = buildprimitive_bulk(cursor, distanceinfo);
     A = distanceinfo{cursor,1};
@@ -713,7 +679,6 @@ for i = 1:trynum
     C = A + b;
     D = A + c;
     idx = knnsearch(pos,[B;C;D]);
-    disp(cursor);
     % if failed to build primitive, skip
     if (isequal(a,-1) || isequal(b,-1) || isequal(c,-1))||distanceinfo{idx(1),3} == 1||distanceinfo{idx(3),3} == 1||distanceinfo{idx(2),3} == 1
         continue;
@@ -724,6 +689,8 @@ for i = 1:trynum
         
         
         %extra check
+        % if too many points in the new primitive cell have already been
+        % identified earlier, disregard the new region.
         orders = distanceinfo{cursor,2};
         testpts = zeros(tenThousand,3);
         for j = 1:tenThousand
@@ -749,14 +716,8 @@ for i = 1:trynum
         if count5/size(D,1)>0.2
             continue
         end
-%         neighborBox = genNeighborBox(pointsInBox, a, b, c,distanceinfo,cursor,tenThousand);
-%         for j = 1:6
-%             completelyInData = allInData(neighborBox{i,1}, neighborBox{i,2},distanceinfo,pos,tenThousand);
-%             if ~completelyInData 
-%                 inInterior = 0;
-%                 break;
-%             end
-%         end
+
+        
         [idx,dd] = knnsearch(pos,hull);
         for j = 1:8
             if dd(j)>tol2
@@ -780,13 +741,9 @@ for i = 1:trynum
         region = merge(r);
         
         % niggli reduction
-        [v1, v2, v3, v4, v5, v6] = niggliReduce_fromThePaper(a, b, c);
+        [v1, v2, v3, v4, v5, v6] = niggliReduce(a, b, c);
         % determine bravais type
         str = niggliToLattice(v1, v2, v3, v4, v5, v6);
-%         % for debugging
-%         disp(str);
-        % count the number of atoms in the region
-        
         [idx,d] = knnsearch(pos,region);
         row = size(d,1);
         count3 = 1;

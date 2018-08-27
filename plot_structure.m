@@ -27,7 +27,7 @@ for i = 1:m
     if size(temp,1)>1
         scatter3(temp(:,1), temp(:,2), temp(:,3), 30, color, 'fill')
     end
-    if i ~=m
+    if i~=m
         [a,b,c,p] = findCoord(info, i, distanceinfo);
         abc = [a;b;c];
         info{i,9} = p;

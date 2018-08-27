@@ -7,10 +7,10 @@ global tol1 tol2 tol3 tol4 tol5
 % initial errormsg to 0
 errormsg = 0;
 
-% pick 27 nearest neighbors of the starting point if the sample has at
-% least 27 points
+% pick 50 nearest neighbors of the starting point if the sample has at
+% least 50 points
 [m,gar] = size(pos);
-NUM = min(27,m);
+NUM = min(50,m);
 
 % A is the starting point
 A = P;
